@@ -1,8 +1,8 @@
 import time
 
 a_time = time.time()
-target, num_coins = map(int, input().split(' '))
-coins = list(map(int,input().split(' ')))
+target, num_coins = map(int,input().split())
+coins = list(map(int,input().split()))
 b_time = time.time()
 print("input:", target, num_coins, "\ncoins:", coins)
 print(round(b_time - a_time, 3), "secs")
