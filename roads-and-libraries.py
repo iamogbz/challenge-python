@@ -48,7 +48,8 @@ for i in range(q):
     if k >= l:
         cost = n*l
     else:
-        for c in graph.get_components():
-            cost += (c-1)*k+l
+        cs = graph.get_components()
+        s = len(cs)
+        cost = (sum(cs)-s)*k + s*l
     
     print(cost)
