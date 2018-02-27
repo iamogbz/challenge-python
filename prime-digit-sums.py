@@ -47,7 +47,8 @@ def build_map(k, v):
     nav_map[k].add(int(v))
 
 # build list of numbers satisifying prime requirement
-def specials(s, t): # possible optimisation only track last and first 5 digits
+# possible optimisation only track last and first 5 digits
+def specials(s=3, t=6):
     l = list(filter(is_special, range(10**(s-1),10**s)))
     for i in range(s, t):
         ns = []
@@ -79,9 +80,9 @@ def specials(s, t): # possible optimisation only track last and first 5 digits
                     ns.append(int(after))
                     build_map(d,j)
         
-        if i == 5: break
+        if i == t-1: break
         else: l = set(ns)
-    return l
+    return t-1, l
 
 def count(seed, t, n=0):
     if t < 5: return 0 # problem specification 
@@ -105,13 +106,11 @@ primes = primesieve(45)
 
 for i in range(q):
     n = int(input().strip())
-    max = 10**n
-    min = max//10
     st = time.time()
-    sps = specials(3,6)
+    t, sps = specials()
     et = time.time()
     print("specials:", round(et-st, 3), len(sps))
     st = time.time()
-    c = count(sps, n, 5)
+    c = count(sps, n, t)
     et = time.time()
     print("counting:", round(et-st, 3), c)
