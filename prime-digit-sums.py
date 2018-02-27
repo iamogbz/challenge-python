@@ -1,9 +1,11 @@
 import math
 import time
+import numpy as np
+from numpy import linalg as LA
 
 primes = []
 nav_map = {} # adjancency matrix for groups of five
-soln_cache = {} # caching results of count function
+limit = 10**9 + 7 # as per requirements
 
 def primesieve(n):
     global primes
@@ -43,7 +45,7 @@ def build_map(k, v):
     if len(k) != 5: return
     if k not in nav_map: 
         nav_map[k] = set()
-        soln_cache[k] = {0:1}
+    
     nav_map[k].add(k[-4:]+str(v))
 
 # build list of numbers satisifying prime requirement
@@ -84,34 +86,59 @@ def specials(s=3, t=6):
         else: l = set(ns)
     return t-1, l
 
-def count(seed, t, n=0):
-    if t < 5: return 0 # problem specification 
-    elif t == n: return len(seed)
-    i = t - n
-    c = 0
-    for s in seed:
-        k = str(s)
-        if k in nav_map:
-            nm = nav_map[k]
-            if i not in soln_cache[k]:
-                soln_cache[k][i] = count(nm, t-1, n)
-            
-            c += soln_cache[k][i]
+# count number of paths of given length
+def count(A, ns, l, t, n=0):
+    i = t-n
+    if i == 0: return len(sps)
     
-    limit = 10**9 + 7 # as per requirements
-    return c if c < limit else c % limit
+    b = LA.matrix_power(A, i-1) # use .dot and cache results
+    a = np.dot(A, b)
+    leftout = [sum([1 for n in nav_map[ns[i]] if n not in nav_map]) for i in range(l)]
+    c = 0
+    for i in range(l):
+        if not ns[i].startswith('0'):
+            c += sum(a[i])
+            # number of times visited in i-1 length
+            for j in range(l):
+                # add terminal values
+                c += b[i][j] * leftout[j]
+        
+    return c
 
 # main solution
+s_t = time.time()
 q = int(input().strip())
+# q = 2 * 10**4
+
+st = time.time()
 primes = primesieve(45)
+et = time.time()
+print("sieving:", round(et-st, 3), primes)
+
+st = time.time()
+t, sps = specials()
+et = time.time()
+print("specials:", round(et-st, 3), len(sps)) # num special 5 digit numbers
+
+# construct adjacency matrix
+st = time.time()
+ns = list(nav_map.keys())
+l = len(ns)
+A = np.zeros((l,l),dtype='int64')
+for i in range(l):
+    for j in range(l):
+        if ns[j] in nav_map[ns[i]]: 
+            A[i][j] = 1
+et = time.time()
+print("adj matx:", round(et-st, 3), np.sum(A))
 
 for i in range(q):
     n = int(input().strip())
+    # n = 4 * 10**5
     st = time.time()
-    t, sps = specials()
-    et = time.time()
-    print("specials:", round(et-st, 3), len(sps))
-    st = time.time()
-    c = count(sps, n, t)
+    c = count(A, ns, l, n, t)
     et = time.time()
     print("counting:", round(et-st, 3), c)
+
+e_t = time.time()
+print("time:", round(e_t-s_t, 3))
