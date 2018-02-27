@@ -2,7 +2,7 @@ import math
 import time
 
 primes = []
-nav_map = {} # for linking groups of five digits
+nav_map = {} # adjancency matrix for groups of five
 soln_cache = {} # caching results of count function
 
 def primesieve(n):
@@ -44,7 +44,7 @@ def build_map(k, v):
     if k not in nav_map: 
         nav_map[k] = set()
         soln_cache[k] = {0:1}
-    nav_map[k].add(int(v))
+    nav_map[k].add(k[-4:]+str(v))
 
 # build list of numbers satisifying prime requirement
 # possible optimisation only track last and first 5 digits
@@ -94,7 +94,8 @@ def count(seed, t, n=0):
         if k in nav_map:
             nm = nav_map[k]
             if i not in soln_cache[k]:
-                soln_cache[k][i] = count([k[-4:]+str(n) for n in nm], t-1, n)
+                soln_cache[k][i] = count(nm, t-1, n)
+            
             c += soln_cache[k][i]
     
     limit = 10**9 + 7 # as per requirements
