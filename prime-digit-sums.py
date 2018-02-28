@@ -37,7 +37,7 @@ def is_special(n):
         if not is_prime(sum_digits(d[i:i+4])): return False
         if not is_prime(sum_digits(d[i:i+3])): return False
     
-    return l > 2 # specialness starts from 3
+    return True # vacuous truth
 
 # build map and function cache    
 def build_map(k, v):
@@ -86,10 +86,11 @@ def specials(s=3, t=6):
     return t-1, l
 
 # count number of paths of given length
-def count(t, n=0):    
-    i = t-n
-    if i < 0: raise ValueError("values shorter than 5 can not be special")
+def count(t, n=0):
+    if t < 0: raise ValueError("negative length not allowed")
+    elif t < 5: return [0,9,90,303,280][t]
     else:
+        i = t-n
         st = len(soln_cache) - 1
         if i > st:
             for i0 in range(st,i):
