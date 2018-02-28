@@ -1,11 +1,9 @@
 import math
 import time
-import numpy as np
-from numpy import linalg as LA
 
 primes = []
-nav_map = {} # adjancency matrix for groups of five
-exp_cache = {} # matrix multiplication cache
+nav_map = {} # connect graph for groups of five
+soln_cache = [] # solution cache
 limit = 10**9 + 7 # as per requirements
 
 def primesieve(n):
@@ -87,58 +85,24 @@ def specials(s=3, t=6):
         else: l = set(ns)
     return t-1, l
 
-# matrix dot product
-def dot(X, Y):
-    l = len(X)
-    result = [[0]*l for i in range(l)]
-    for i in range(l):
-        for j in range(l):
-            for k in range(l):
-                result[i][j] += X[i][k] * Y[k][j]
-    
-    return result
-
-# matrix power
-def mat_exp(A, e, l):
-    if e not in exp_cache:
-        if e == 0:
-            exp_cache[e] = [[1 if i == j else 0 for j in range(l)] for i in range(l)]
-        elif e == 1:
-            exp_cache[e] = A
-        else:
-            if e % 2 == 0:
-                exp = np.dot(mat_exp(A, math.ceil(e/2), l), mat_exp(A, math.floor(e/2), l))
-            else:
-                exp = np.dot(mat_exp(A, e-1, l), A)
-            np.putmask(exp, exp>=limit, exp%limit)
-            exp_cache[e] = exp
-        
-    return exp_cache[e]
-
 # count number of paths of given length
-def count(A, ns, l, t, n=0):
+def count(t, n=0):    
     i = t-n
     if i < 0: raise ValueError("values shorter than 5 can not be special")
-    if i == 0: return len(sps)
-    
-    ## use .dot and cache results
-    st = time.time()
-    e = max(1, i)
-    b = mat_exp(A, e-1, l)
-    a = mat_exp(A, e, l)
-    et = time.time()
-    print("matx exp:", round(et-st, 3), np.sum(a), np.sum(b))
-    leftout = [sum([1 for n in nav_map[ns[i]] if n not in nav_map]) for i in range(l)]
-    c = 0
-    for i in range(l):
-        if not ns[i].startswith('0'):
-            c += np.sum(a[i]) % limit
-            # number of times visited in i-1 length
-            for j in range(l):
-                # add terminal values
-                c += (b[i][j] * leftout[j]) % limit
+    else:
+        st = len(soln_cache) - 1
+        if i > st:
+            for i0 in range(st,i):
+                c_map = {}
+                for k,v in soln_cache[-1].items():
+                    if k not in nav_map: continue
+                    for ns in nav_map[k]:
+                        if ns not in c_map: c_map[ns] = 0
+                        c_map[ns] += v
+                        c_map[ns] %= limit
+                soln_cache.append(c_map)
         
-    return c % limit
+    return sum(soln_cache[i].values()) % limit
 
 ## main solution
 s_t = time.time()
@@ -157,23 +121,16 @@ t, sps = specials()
 et = time.time()
 print("specials:", round(et-st, 3), len(sps))
 
-# construct adjacency matrix
-st = time.time()
-ns = list(nav_map.keys())
-l = len(ns)
-A = np.zeros((l,l),dtype=object)
-for i in range(l):
-    for j in range(l):
-        if ns[j] in nav_map[ns[i]]: 
-            A[i][j] = 1
-et = time.time()
-print("adj matx:", round(et-st, 3), np.sum(A))
+# initialise solution cache
+soln_cache.append({})
+for s in sps:
+    soln_cache[0][str(s)] = 1
 
 for i in range(q):
     n = int(input().strip())
     # n = 4 * 10**5
     st = time.time()
-    c = count(A, ns, l, n, t)
+    c = count(n, t)
     et = time.time()
     print("counting:", round(et-st, 3), c)
 
