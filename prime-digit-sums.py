@@ -5,7 +5,7 @@ from numpy import linalg as LA
 
 primes = []
 nav_map = {} # adjancency matrix for groups of five
-exp_cache = [] # matrix multiplication cache
+exp_cache = {} # matrix multiplication cache
 limit = 10**9 + 7 # as per requirements
 
 def primesieve(n):
@@ -100,18 +100,15 @@ def dot(X, Y):
 
 # matrix power
 def mat_exp(A, e, l):
-    mcs = len(exp_cache)
-    if (mcs == 0):
-        exp_cache.append([[1 if i == j else 0 for j in range(l)] for i in range(l)])
-        mcs += 1
-    
-    st = time.time()
-    print(mcs, "->", e+1)
-    for i in range(mcs, e+1):
-        exp_cache.append(np.dot(exp_cache[i-1], A))
-    
-    et = time.time()
-    print("mat exp:", round(et-st, 3))
+    if e not in exp_cache:
+        if e == 0:
+            exp_cache[e] = [[1 if i == j else 0 for j in range(l)] for i in range(l)]
+        elif e == 1:
+            exp_cache[e] = A
+        else:
+            exp = np.dot(mat_exp(A, math.ceil(e/2), l), mat_exp(A, math.floor(e/2), l))
+            np.putmask(exp, exp>=limit, exp%limit)
+            exp_cache[e] = exp
         
     return exp_cache[e]
 
@@ -121,15 +118,13 @@ def count(A, ns, l, t, n=0):
     if i < 0: raise ValueError("values shorter than 5 can not be special")
     if i == 0: return len(sps)
     
-    b = LA.matrix_power(A, i-1)
-    np.putmask(b, b>=limit, b%limit)
-    a = np.dot(A, b)
-    np.putmask(a, a>=limit, a%limit)
     ## use .dot and cache results
-    # e = max(1, i)
-    # a = mat_exp(A, e, l)
-    # b = exp_cache[e-1]
-    print(np.sum(a), np.sum(b))
+    st = time.time()
+    e = max(1, i)
+    b = mat_exp(A, e-1, l)
+    a = np.dot(A, b)
+    et = time.time()
+    print("matx exp:", round(et-st, 3), np.sum(a), np.sum(b))
     leftout = [sum([1 for n in nav_map[ns[i]] if n not in nav_map]) for i in range(l)]
     c = 0
     for i in range(l):
