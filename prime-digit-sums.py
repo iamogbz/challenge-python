@@ -142,20 +142,22 @@ def count(A, ns, l, t, n=0):
         
     return c % limit
 
-# main solution
+## main solution
 s_t = time.time()
 q = int(input().strip())
 # q = 2 * 10**4
 
+# get prime factors
 st = time.time()
 primes = primesieve(45)
 et = time.time()
 print("sieving:", round(et-st, 3), primes)
 
+# num special 5 digit numbers
 st = time.time()
 t, sps = specials()
 et = time.time()
-print("specials:", round(et-st, 3), len(sps)) # num special 5 digit numbers
+print("specials:", round(et-st, 3), len(sps))
 
 # construct adjacency matrix
 st = time.time()
