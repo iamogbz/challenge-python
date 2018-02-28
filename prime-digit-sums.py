@@ -106,7 +106,10 @@ def mat_exp(A, e, l):
         elif e == 1:
             exp_cache[e] = A
         else:
-            exp = np.dot(mat_exp(A, math.ceil(e/2), l), mat_exp(A, math.floor(e/2), l))
+            if e % 2 == 0:
+                exp = np.dot(mat_exp(A, math.ceil(e/2), l), mat_exp(A, math.floor(e/2), l))
+            else:
+                exp = np.dot(mat_exp(A, e-1, l), A)
             np.putmask(exp, exp>=limit, exp%limit)
             exp_cache[e] = exp
         
@@ -122,7 +125,7 @@ def count(A, ns, l, t, n=0):
     st = time.time()
     e = max(1, i)
     b = mat_exp(A, e-1, l)
-    a = np.dot(A, b)
+    a = mat_exp(A, e, l)
     et = time.time()
     print("matx exp:", round(et-st, 3), np.sum(a), np.sum(b))
     leftout = [sum([1 for n in nav_map[ns[i]] if n not in nav_map]) for i in range(l)]
