@@ -9,7 +9,7 @@ exp_cache = [] # matrix multiplication cache
 limit = 10**9 + 7 # as per requirements
 
 def primesieve(n):
-    global primes
+    primes = []
     limit = int(n**0.5+1)
     sieve = [True]*limit
     for i in range(2,limit):
