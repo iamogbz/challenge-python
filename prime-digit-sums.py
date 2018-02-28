@@ -5,6 +5,7 @@ from numpy import linalg as LA
 
 primes = []
 nav_map = {} # adjancency matrix for groups of five
+exp_cache = [] # matrix multiplication cache
 limit = 10**9 + 7 # as per requirements
 
 def primesieve(n):
@@ -86,24 +87,60 @@ def specials(s=3, t=6):
         else: l = set(ns)
     return t-1, l
 
+# matrix dot product
+def dot(X, Y):
+    l = len(X)
+    result = [[0]*l for i in range(l)]
+    for i in range(l):
+        for j in range(l):
+            for k in range(l):
+                result[i][j] += X[i][k] * Y[k][j]
+    
+    return result
+
+# matrix power
+def mat_exp(A, e, l):
+    mcs = len(exp_cache)
+    if (mcs == 0):
+        exp_cache.append([[1 if i == j else 0 for j in range(l)] for i in range(l)])
+        mcs += 1
+    
+    st = time.time()
+    print(mcs, "->", e+1)
+    for i in range(mcs, e+1):
+        exp_cache.append(np.dot(exp_cache[i-1], A))
+    
+    et = time.time()
+    print("mat exp:", round(et-st, 3))
+        
+    return exp_cache[e]
+
 # count number of paths of given length
 def count(A, ns, l, t, n=0):
     i = t-n
+    if i < 0: raise ValueError("values shorter than 5 can not be special")
     if i == 0: return len(sps)
     
-    b = LA.matrix_power(A, i-1) # use .dot and cache results
+    b = LA.matrix_power(A, i-1)
+    np.putmask(b, b>=limit, b%limit)
     a = np.dot(A, b)
+    np.putmask(a, a>=limit, a%limit)
+    ## use .dot and cache results
+    # e = max(1, i)
+    # a = mat_exp(A, e, l)
+    # b = exp_cache[e-1]
+    print(np.sum(a), np.sum(b))
     leftout = [sum([1 for n in nav_map[ns[i]] if n not in nav_map]) for i in range(l)]
     c = 0
     for i in range(l):
         if not ns[i].startswith('0'):
-            c += sum(a[i])
+            c += np.sum(a[i]) % limit
             # number of times visited in i-1 length
             for j in range(l):
                 # add terminal values
-                c += b[i][j] * leftout[j]
+                c += (b[i][j] * leftout[j]) % limit
         
-    return c
+    return c % limit
 
 # main solution
 s_t = time.time()
@@ -124,7 +161,7 @@ print("specials:", round(et-st, 3), len(sps)) # num special 5 digit numbers
 st = time.time()
 ns = list(nav_map.keys())
 l = len(ns)
-A = np.zeros((l,l),dtype='int64')
+A = np.zeros((l,l),dtype=object)
 for i in range(l):
     for j in range(l):
         if ns[j] in nav_map[ns[i]]: 
