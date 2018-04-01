@@ -31,8 +31,8 @@ class Graph:
             u = min(queue, key=lambda x: d[x])   # minimum distance node in queue
             queue.remove(u)                      # removal to mark as visited
             if t:                                # if there is a target
-                if u == t: break                  # we've hit the target
-                if d[u] == self.INF: return -1    # minimum distance is infinity 
+                if u == t: break                 # we've hit the target
+                if d[u] == self.INF: return -1   # minimum distance is infinity 
             for v in set(self.nodes[u]) & queue: # neighbour nodes still in queue
                 alt = d[u] + 1 # edges[u][v]     # path(s,v) = path(s,u) + path(u,v)
                 if alt < d[v]:                   # if smaller then shorter path found
