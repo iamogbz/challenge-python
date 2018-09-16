@@ -1,23 +1,30 @@
+# https://www.hackerrank.com/challenges/ctci-coin-change
+
 import time
 
-a_time = time.time()
-target, num_coins = map(int,input().split())
-coins = list(map(int,input().split()))
-b_time = time.time()
-print("input:", target, num_coins, "\ncoins:", coins)
-print(round(b_time - a_time, 3), "secs")
+TIME_A = time.time()
+TARGET, NUM_COINS = map(int, input().split())
+COINS = list(map(int, input().split()))
+TIME_B = time.time()
+print("input:", TARGET, NUM_COINS, "\ncoins:", COINS)
+print(round(TIME_B - TIME_A, 3), "secs")
 
-mem = [[None for i in range(50)] for i in range(251)]
+MEM = [[None for i in range(50)] for i in range(251)]
+
+
 def change_combs(target, coin_idx):
-    if coin_idx >= num_coins:
+    if coin_idx >= NUM_COINS:
         return 1 if target == 0 else 0
-    elif mem[target][coin_idx] is None:
-        c0 = coins[coin_idx]
-        mem[target][coin_idx] = change_combs(target, coin_idx + 1) + (0 if c0 > target else change_combs(target - c0, coin_idx))
-    return mem[target][coin_idx]
+    elif MEM[target][coin_idx] is None:
+        c_0 = COINS[coin_idx]
+        MEM[target][coin_idx] = change_combs(target, coin_idx + 1) + (
+            0 if c_0 > target else change_combs(target - c_0, coin_idx)
+        )
+    return MEM[target][coin_idx]
 
-a_time = time.time()
-c = change_combs(target, 0)
-b_time = time.time()
-print("\nresult:", c)
-print(round(b_time - a_time, 3), "secs")
+
+TIME_A = time.time()
+COMBS = change_combs(TARGET, 0)
+TIME_B = time.time()
+print("\nresult:", COMBS)
+print(round(TIME_B - TIME_A, 3), "secs")

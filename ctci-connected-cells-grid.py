@@ -1,17 +1,20 @@
+# https://www.hackerrank.com/challenges/ctci-connected-cell-in-a-grid
+
 import time
+
 
 class Graph:
     size = None
     nodes = None
-    
+
     def __init__(self, size):
         self.size = size
         self.nodes = [[] for i in range(size)]
-    
+
     def connect(self, u, v):
         self.nodes[u] += [v]
         self.nodes[v] += [u]
-        
+
     def get_components(self):
         seen = set()
         result = set()
@@ -20,52 +23,56 @@ class Graph:
                 c = self.dfs(i)
                 seen |= c
                 result.add(len(c))
-            
+
         return result
-    
+
     # Depth-first search
     def dfs(self, root):
         seen = set()
         stack = [root]
-        while stack: # not empty
+        while stack:  # not empty
             n = stack.pop()
             if n not in seen:
                 seen.add(n)
                 stack.extend(self.nodes[n])
-            
+
         return seen
-    
 
-n = int(input().strip())
-m = int(input().strip())
-graph = Graph(n*m)
-a_time = time.time()
-p = list(map(int, input().split()))
+
+num_rows = int(input().strip())
+num_cols = int(input().strip())
+graph = Graph(num_rows * num_cols)
+time_a = time.time()
+curr_row = list(map(int, input().split()))
 # build graph
-for i in range(n-1):
-    not_last_row = i+1 < n
-    if not_last_row: q = list(map(int, input().split()))
-    
-    for j in range(m):
-        not_last_col = j+1 < m
-        if p[j]: # if value is 1
-            node = i*m+j
-            if not_last_col:
-                if p[j+1]: graph.connect(node, node+1)
-                if not_last_row and q[j+1]: graph.connect(node, node+1+m)
-            if not_last_row:
-                if q[j]: graph.connect(node, node+m)
-                if j > 0 and q[j-1]: graph.connect(node, node-1+m)
-        
-    p = q
+for i in range(num_rows - 1):
+    not_last_row = i + 1 < num_rows
+    if not_last_row:
+        next_row = list(map(int, input().split()))
 
-b_time = time.time()
-print("filling:", round(b_time - a_time, 3), "secs")
-a_time = time.time()
-c = graph.get_components()
-b_time = time.time()
-print("mapping:", round(b_time - a_time, 3), "secs")
-a_time = time.time()
-print(max(c))
-print("get max:", round(b_time - a_time, 3), "secs")
-b_time = time.time()
+    for j in range(num_cols):
+        not_last_col = j + 1 < num_cols
+        if curr_row[j]:  # if value is 1
+            node = i * num_cols + j
+            if not_last_col:
+                if curr_row[j + 1]:
+                    graph.connect(node, node + 1)
+                if not_last_row and next_row[j + 1]:
+                    graph.connect(node, node + 1 + num_cols)
+            if not_last_row:
+                if next_row[j]:
+                    graph.connect(node, node + num_cols)
+                if j > 0 and next_row[j - 1]:
+                    graph.connect(node, node - 1 + num_cols)
+    curr_row = next_row
+
+time_b = time.time()
+print("filling:", round(time_b - time_a, 3), "secs")
+time_a = time.time()
+comps = graph.get_components()
+time_b = time.time()
+print("mapping:", round(time_b - time_a, 3), "secs")
+time_a = time.time()
+print(max(comps))
+print("get max:", round(time_b - time_a, 3), "secs")
+time_b = time.time()
