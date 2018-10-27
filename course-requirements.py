@@ -4,48 +4,33 @@ def solve(courses):
     :param courses: list of courses [requirement, auxilliary]
     """
     print("---")
-    # all auxillary courses
-    x_courses = set()
-    # build map of core to auxilliary
-    m_courses = dict()
-    for cs in courses:
-        if cs[0] in m_courses:
-            m_courses[cs[0]].add(cs[1])
-        else:
-            m_courses[cs[0]] = set([cs[1]])
-        # keep track of all courses that have requirements
-        x_courses.add(cs[1])
-    # search through courses
-    # take all required courses
-    r_courses = m_courses.keys()
-    # start with only required courses that have no requirements
-    n_courses = r_courses - x_courses
-    print("courses", m_courses)
-    # keep track of required courses seen
+    c2r = dict() # course to requirements
+    r2c = dict() # requirement to courses
+    for [r, c] in courses:
+        if r not in r2c:
+            r2c[r] = set()
+        r2c[r].add(c)
+        if c not in c2r:
+            c2r[c] = set()
+        c2r[c].add(r)
+    # courses with no requirements
+    n_courses = r2c.keys() - c2r.keys()
     v_courses = set()
     count = 0
     while n_courses:
-        print("next", n_courses, v_courses)
-        l_courses = n_courses.intersection(v_courses)
-        if l_courses:
-            print(l_courses, "visited in", v_courses, count)
-            return False
-        # next set of required courses
         p_courses = set()
-        for c in n_courses:
-            count += 1
-            p_courses.update(m_courses.get(c, set()))
-        for p in set(p_courses):
-            count += 1
-            p_courses.difference_update(m_courses.get(p, set()))
-        print("pending", p_courses)
-        # mark last required courses as seen
+        for r in n_courses:
+            for c in r2c.get(r, []):
+                count += 1
+                c2r[c].remove(r)
+                if not c2r[c]:
+                    p_courses.add(c)
         v_courses.update(n_courses)
-        # only queue next courses that are required and were not just checked
-        n_courses = p_courses.intersection(r_courses) - n_courses
+        n_courses = p_courses
 
-    print("visited", v_courses, count)
-    return v_courses == r_courses
+    print(count, v_courses, c2r)
+    return v_courses == set().union(r2c.keys(), c2r.keys())
+
 
 # some tests
 print(solve([[1, 0], [2, 0], [2, 1]]), True)
