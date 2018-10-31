@@ -1,11 +1,11 @@
 def solve(courses):
     """
     Analyse courses for possibility of completion
-    :param courses: list of courses [requirement, auxilliary]
+    :param courses: list of courses [course, requirement]
     """
-    c2r = dict() # course to requirements
-    r2c = dict() # requirement to courses
-    for [r, c] in courses:
+    c2r = dict()  # course to requirements
+    r2c = dict()  # requirement to courses
+    for [c, r] in courses:
         if r not in r2c:
             r2c[r] = set()
         r2c[r].add(c)
