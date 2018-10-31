@@ -24,31 +24,3 @@ def solve(courses):
         n_courses = p_courses
 
     return not sum(map(len, c2r.values()))
-
-
-# some tests
-print(solve([[1, 0], [2, 0], [2, 1]]), True)
-print(solve([[1, 0], [0, 2], [2, 1], [3, 1]]), False)
-print(solve([[1, 0], [2, 0], [2, 1], [3, 1]]), True)
-print(solve([[1, 0], [2, 0], [3, 1], [1, 2]]), True)
-print(solve([[1, 0], [2, 0], [3, 0], [2, 1], [3, 1], [3, 2]]), True)
-print(
-    solve(
-        [
-            [1, 0],
-            [2, 0],
-            [3, 0],
-            [4, 0],
-            [2, 1],
-            [3, 1],
-            [4, 1],
-            [3, 2],
-            [4, 2],
-            [5, 2],
-            [4, 3],
-            [5, 4],
-        ]
-    ),
-    True,
-)
-print(solve([[1, 0], [3, 2], [5, 4], [7, 6], [8, 9], [11, 10]]), True)
