@@ -17,7 +17,7 @@ def count_fields(patches):
                     if left_field != top_field:
                         num_fields = max(left_field, top_field) - 1
                 else:
-                    patches[i][j] = left_field or top_field or num_fields + 1
+                    patches[i][j] = left_field or top_field
             else:
                 num_fields += 1
                 patches[i][j] = num_fields
