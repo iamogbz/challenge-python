@@ -40,22 +40,30 @@ def bubble_sort(q):
 
 def bubble_sort_count(q):
     """Count swaps needed without performing them"""
-    # TODO: optimise this to count in a single pass O(N)
-    n = len(q)
+    queue_size = len(q)
     total_swap_count = 0
     max_value_swap_count = 0
-    for idx in range(n):
-        val = q[idx]
-        count = 0
-        for _ in (x for x in q[idx + 1 :] if x < val):
-            count += 1
-            # if count > BRIBE_LIMIT:
-            #     break
-        if count > max_value_swap_count:
-            max_value_swap_count = count
+
+    # starting from the last place in the queue
+    min_orig_pos_seen = queue_size
+    for curr_pos in range(queue_size, 0, -1):
+        orig_pos = q[curr_pos - 1]  # the values are the original places in queue
+
+        if orig_pos > curr_pos:
+            swaps_needed = orig_pos - curr_pos
+            total_swap_count += swaps_needed
+            if swaps_needed > max_value_swap_count:
+                max_value_swap_count = swaps_needed
+        else:
+            if min_orig_pos_seen > orig_pos:
+                min_orig_pos_seen = orig_pos
+            elif min_orig_pos_seen != orig_pos:
+                total_swap_count += 1
+
+        print([min_orig_pos_seen, curr_pos, [orig_pos], total_swap_count])
+
         # if max_value_swap_count > BRIBE_LIMIT:
-        #     return max_value_swap_count, total_swap_count
-        total_swap_count += count
+        #     break
 
     return max_value_swap_count, total_swap_count
 
