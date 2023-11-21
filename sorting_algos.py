@@ -95,30 +95,34 @@ def jumble(s: "Sequence"):
     return ss
 
 
+def fibs(a: "int" = 0, b: "int" = 1, n: "int" = 10):
+    """Get fibonacci sub sequence"""
+    if n < 1:
+        return []
+    return [a, *fibs(b, a + b, n - 1)]
+
+
 SORTING_TESTCASES = [
-    jumble([n + 1 for n in range(5)]),
-    jumble([n + 1 for n in range(8)]),
-    jumble([n + 1 for n in range(13)]),
-    jumble([n + 1 for n in range(21)]),
+    ((l := [n + 1 for n in range(f)]), jumble(l)) for f in fibs(5, 8, 4)
 ]
 
 
 def test_quick_sort():
     """Validate quick sort against python default sorting"""
-    for tc in SORTING_TESTCASES:
-        assert quick_sort(tc) == sorted(tc)
+    for ec, tc in SORTING_TESTCASES:
+        assert ec == quick_sort(tc)
 
 
 def test_bubble_sort():
     """Validate bubble sort against python default sorting"""
-    for tc in SORTING_TESTCASES:
-        assert bubble_sort(tc) == sorted(tc)
+    for ec, tc in SORTING_TESTCASES:
+        assert ec == bubble_sort(tc)
 
 
 def test_comb_sort():
     """Validate comb shell sort against python default sorting"""
-    for tc in SORTING_TESTCASES:
-        assert bubble_sort(tc, len(tc) // 2) == sorted(tc)
+    for ec, tc in SORTING_TESTCASES:
+        assert ec == bubble_sort(tc, len(tc) // 2)
 
 
 # run tests
