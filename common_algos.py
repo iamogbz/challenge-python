@@ -8,6 +8,7 @@ def quick_sort(s: "Sequence"):
     Quick sort algorithm
     Worst case time: O(N^2)
     Average case time: O(NlogN)
+    https://en.wikipedia.org/wiki/Quicksort
 
     Pick a approximately mid value as the pivot
     Place values less and more than pivot before and after it respectively
@@ -26,11 +27,11 @@ def quick_sort(s: "Sequence"):
         m = n // 2
         p = q[m]  # pivot value
         # NOTE: this could be swapped in place
-        return (
-            quick_sort(n for n in q if n < p)
-            + list(n for n in q if n == p)
-            + quick_sort(n for n in q if n > p)
-        )
+        return [
+            *quick_sort(n for n in q if n < p),
+            *(n for n in q if n == p),
+            *quick_sort(n for n in q if n > p),
+        ]
 
 
 def bubble_sort(s: "Sequence", gap: "int" = 1):
@@ -38,10 +39,12 @@ def bubble_sort(s: "Sequence", gap: "int" = 1):
     Bubble sort algorithm
     Worst case time: O(N^2)
     Average case time: O(NlogN)
+    https://en.wikipedia.org/wiki/Comb_sort
+    https://en.wikipedia.org/wiki/Shellsort
 
     [prefer insertion sort]
     Starting from one end of the sequence and moving to the opposite end
-    Pick the next two values and swap them into correct positions
+    Using gap pick the next two values and swap them into correct positions
     Move to the next two values and repeat until no swaps are needed
 
     :return: sequence sorted in ascending order
@@ -50,18 +53,21 @@ def bubble_sort(s: "Sequence", gap: "int" = 1):
     # print([q])
     n = len(q)  # count final number of elements
 
-    for l in range(n - gap, gap - 1, -1):
-        did_swap = False
-        for i in range(l):
-            a = q[i]
-            b = q[i + gap]
-            if a > b:
-                did_swap = True
-                q[i] = b
-                q[i + gap] = a
+    for g in range(gap, 0, -1):  # NOTE: alternatively reduce gap by half
+        # print("gap", g)
+        for l in range(n - g, g - 1, -1):
+            did_swap = False
+            for i in range(l):
+                a = q[i]
+                b = q[i + g]
+                if a > b:
+                    did_swap = True
+                    q[i] = b
+                    q[i + g] = a
 
-        if not did_swap:
-            break
+            # print(did_swap, q)
+            if not did_swap:
+                break
 
     return q
 
@@ -109,6 +115,13 @@ def test_bubble_sort():
         assert bubble_sort(tc) == sorted(tc)
 
 
+def test_comb_sort():
+    """Validate comb shell sort against python default sorting"""
+    for tc in SORTING_TESTCASES:
+        assert bubble_sort(tc, len(tc) // 2) == sorted(tc)
+
+
 # run tests
 test_quick_sort()
 test_bubble_sort()
+test_comb_sort()
