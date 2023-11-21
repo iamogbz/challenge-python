@@ -42,7 +42,7 @@ def bubble_sort(s: "Sequence", gap: "int" = 1):
     https://en.wikipedia.org/wiki/Comb_sort
     https://en.wikipedia.org/wiki/Shellsort
 
-    [prefer insertion sort]
+    NOTE: look into insertion sort preference
     Starting from one end of the sequence and moving to the opposite end
     Using gap pick the next two values and swap them into correct positions
     Move to the next two values and repeat until no swaps are needed
@@ -84,7 +84,36 @@ def selection_sort(q):
     return q
 
 
-def insertion_sort(q):
+def insertion_sort(s: "Sequence"):
+    """
+    Insertion sort algorithm
+    Worst case time: O(N^2)
+    Average case time: O(N^2)
+    https://en.wikipedia.org/wiki/Insertion_sort
+
+    Starting from one end of the sequence and moving to the opposite end
+    Find the correct value position in the sorted section
+    Insert the current value in the correct position shrinking the unsorted section
+    Move to the next value from the unsorted section
+
+    :return: sequence sorted in ascending order
+    """
+    q = list(s)  # consume all elements of sequence
+    # print([q])
+    n = len(q)  # count final number of elements
+
+    for i in range(1, n):
+        for p in range(i - 1, -1, -1):
+            v = q[i]
+            u = q[p]
+            if v >= u:
+                q.insert(p + 1, q.pop(i))
+                break
+            elif p == 0:
+                q.insert(p, q.pop(i))
+
+        # print(q)
+
     return q
 
 
@@ -102,30 +131,38 @@ def fibs(a: "int" = 0, b: "int" = 1, n: "int" = 10):
     return [a, *fibs(b, a + b, n - 1)]
 
 
+TESTCASE_COUNT = 4
 SORTING_TESTCASES = [
-    ((l := [n + 1 for n in range(f)]), jumble(l)) for f in fibs(5, 8, 4)
+    ((t := [n + 1 for n in range(f)]), jumble(t)) for f in fibs(5, 8, TESTCASE_COUNT)
 ]
 
 
 def test_quick_sort():
-    """Validate quick sort against python default sorting"""
+    """Validate quick sort"""
     for ec, tc in SORTING_TESTCASES:
         assert ec == quick_sort(tc)
 
 
 def test_bubble_sort():
-    """Validate bubble sort against python default sorting"""
+    """Validate bubble sort"""
     for ec, tc in SORTING_TESTCASES:
         assert ec == bubble_sort(tc)
 
 
 def test_comb_sort():
-    """Validate comb shell sort against python default sorting"""
+    """Validate comb shell sort"""
     for ec, tc in SORTING_TESTCASES:
         assert ec == bubble_sort(tc, len(tc) // 2)
+
+
+def test_insertion_sort():
+    """Validate insertion sort"""
+    for ec, tc in SORTING_TESTCASES:
+        assert ec == insertion_sort(tc)
 
 
 # run tests
 test_quick_sort()
 test_bubble_sort()
 test_comb_sort()
+test_insertion_sort()
