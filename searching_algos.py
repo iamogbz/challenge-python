@@ -1,7 +1,7 @@
 """https://en.wikipedia.org/wiki/Search_algorithm"""
 
 
-def binary(graph, root, target):
+def binary(graph: "Graph", target, source=None):
     """
     Binary tree search
     https://en.wikipedia.org/wiki/Binary_search_algorithm
@@ -9,23 +9,43 @@ def binary(graph, root, target):
     return target
 
 
-def bfs(graph, root, target):
+def bfs(graph: "Graph", value, root=None):
     """
     Breadth first search
     https://en.wikipedia.org/wiki/Breadth-first_search
     """
-    return target
+    visited_nodes = set()
+    search_nodes = [root]  # queue: FIFO
+    # next_nodes = set(search_nodes)
+    while search_nodes:
+        curr_node = search_nodes.pop(0)
+        # print(search_nodes, curr_node, visited_nodes, graph.get_adjacent(curr_node))
+        if curr_node in visited_nodes:
+            continue
+        elif curr_node is not None:
+            visited_nodes.add(curr_node)
+
+        for next_node in graph.get_adjacent(curr_node):
+            if curr_node is not None:
+                conn_value = graph.get_value(curr_node, next_node)
+                if conn_value == value:
+                    return (curr_node, next_node)
+            if next_node not in visited_nodes and next_node not in search_nodes:
+                # next_nodes.add(next_node)
+                search_nodes.append(next_node)
+
+    return (None, None)
 
 
-def dfs(graph, root, target):
+def dfs(graph: "Graph", value, root=None):
     """
     Depth first search
     https://en.wikipedia.org/wiki/Depth-first_search
     """
-    return target
+    return (None, None)
 
 
-def dijkstra(graph, root, target):
+def dijkstra(graph: "Graph", target, source=None):
     """
     Dijkstra
     https://en.wikipedia.org/wiki/Dijkstra%27s_algorithm
