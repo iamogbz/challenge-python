@@ -80,7 +80,33 @@ def heap_sort(q):
     return q
 
 
-def selection_sort(q):
+def selection_sort(s: "Sequence"):
+    """
+    Selection sort algorithm
+    Worst case time: O(N^2)
+    Average case time: O(N^2)
+    https://en.wikipedia.org/wiki/Selection_sort
+
+    NOTE: sort off a reverse insertion sort
+    Starting from one end of the sequence and moving to the opposite end
+    Find the lowest/highest value in the unsorted section
+    Insert the selected value at the head/tail growing the sorted section
+    Find the next value from the unsorted section
+
+    :return: sequence sorted in ascending order
+    """
+    q = list(s)  # consume all elements of sequence
+    # print([q])
+    n = len(q)  # count final number of elements
+
+    for i in range(n):
+        min_idx = i
+        for j in range(i, n):
+            if q[j] < q[min_idx]:
+                min_idx = j
+        # print(q, i, min_idx)
+        q.insert(i, q.pop(min_idx))
+
     return q
 
 
@@ -161,8 +187,15 @@ def test_insertion_sort():
         assert ec == insertion_sort(tc)
 
 
+def test_selection_sort():
+    """Validate selection sort"""
+    for ec, tc in SORTING_TESTCASES:
+        assert ec == selection_sort(tc)
+
+
 # run tests
 test_quick_sort()
 test_bubble_sort()
 test_comb_sort()
 test_insertion_sort()
+test_selection_sort()
