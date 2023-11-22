@@ -77,6 +77,10 @@ def merge_sort(s: "Sequence"):
     Merge sort algorithm
     Worst case time: O(NlogN)
     Average case time: O(NlogN)
+    https://en.wikipedia.org/wiki/Merge_sort
+
+    Split list into smaller part recursively
+    When merging lists ensure they stay sorted
 
     :return: sequence sorted in ascending order
     """
@@ -86,26 +90,28 @@ def merge_sort(s: "Sequence"):
     if n < 2:
         return q
 
-    def merge(a: "Sequence", b: "Sequence"):
-        r = []
-        a_n = len(a)
-        b_n = len(b)
-        i = j = 0
-        while i < a_n or j < b_n:
-            a_v = a[i] if i < a_n else None
-            b_v = b[j] if j < b_n else None
-            if a_v is not None and (b_v is None or a_v <= b_v):
-                r.append(a_v)
-                i += 1
-            if b_v is not None and (a_v is None or a_v >= b_v):
-                r.append(b_v)
-                j += 1
+    m = n // 2  # split sections into 2 for simple binary merge
+    # queue sections to be individually sorted
+    s_idxs = [(None, m), (m, None)]
+    # recursively merge sort individual sections
+    q_a, q_b = (merge_sort(q[i:j]) for (i, j) in s_idxs)
+    # merge sorted sections maintaining sorting
+    r = []
+    a_n = len(q_a)
+    b_n = len(q_b)
+    i = j = 0
+    while i < a_n or j < b_n:
+        a_v = q_a[i] if i < a_n else None
+        b_v = q_b[j] if j < b_n else None
+        if a_v is not None and (b_v is None or a_v <= b_v):
+            r.append(a_v)
+            i += 1
+        if b_v is not None and (a_v is None or a_v >= b_v):
+            r.append(b_v)
+            j += 1
 
-        # print(a, b, r)
-        return r
-
-    m = n // 2
-    return merge(merge_sort(q[:m]), merge_sort(q[m:]))
+    # print(q_a, q_b, r)
+    return r
 
 
 def heap_sort(q):
