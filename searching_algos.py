@@ -9,16 +9,16 @@ def binary(graph: "Graph", target, source=None):
     return target
 
 
-def bfs(graph: "Graph", value, root=None):
+def _fs(graph: "Graph", value, root=None, pos=0):
     """
-    Breadth first search
-    https://en.wikipedia.org/wiki/Breadth-first_search
+    Abstract search algo to highlight traversal diff between breadth and depth first
+    :param pos: 0 for queue, -1 for stack, defaults to 0
     """
     visited_nodes = set()
-    search_nodes = [root]  # queue: FIFO
+    search_nodes = [root]
     # next_nodes = set(search_nodes)
     while search_nodes:
-        curr_node = search_nodes.pop(0)
+        curr_node = search_nodes.pop(pos)  # use FIFO for BFS and LIFO for DFS
         # print(search_nodes, curr_node, visited_nodes, graph.get_adjacent(curr_node))
         if curr_node in visited_nodes:
             continue
@@ -37,12 +37,20 @@ def bfs(graph: "Graph", value, root=None):
     return (None, None)
 
 
+def bfs(graph: "Graph", value, root=None):
+    """
+    Breadth first search
+    https://en.wikipedia.org/wiki/Breadth-first_search
+    """
+    return _fs(graph, value, root, 0)
+
+
 def dfs(graph: "Graph", value, root=None):
     """
     Depth first search
     https://en.wikipedia.org/wiki/Depth-first_search
     """
-    return (None, None)
+    return _fs(graph, value, root, -1)
 
 
 def dijkstra(graph: "Graph", target, source=None):
