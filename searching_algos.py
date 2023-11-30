@@ -1,6 +1,9 @@
 """https://en.wikipedia.org/wiki/Search_algorithm"""
 
 
+from math import inf
+
+
 def binary(graph: "Graph", target, source=None):
     """
     Binary tree search
@@ -59,7 +62,39 @@ def dijkstra(graph: "Graph", target, source=None):
     https://en.wikipedia.org/wiki/Dijkstra%27s_algorithm
     NOTE: see BFS
     """
-    return target
+    # print("target", target)
+    dist = {source: 0}
+    visited_nodes = set()
+    # queue = {source, *graph.get_adjacent(source)}
+    # initialise the queue with the source or all nodes if no source given
+    queue = [source] if source else graph.get_adjacent(source)
+
+    while queue:
+        q = list(
+            (n, dist.get(n, inf), i)
+            for i, n in enumerate(queue)
+            if n is not None and n not in visited_nodes
+        )
+        (min_v, min_dist_v, min_idx) = min(q)
+        # print("min", min_v, min_dist_v, graph.get_adjacent(min_v))
+        # target currently has the lowest distance amongst remaining possible steps
+        if target == min_v:
+            break
+
+        visited_nodes.add(queue.pop(min_idx))
+
+        for nxt_v in graph.get_adjacent(min_v):
+            # print("dist", dist, nxt_v, visited_nodes)
+            if nxt_v in visited_nodes:
+                continue
+            conn_w = graph.get_value(min_v, nxt_v)
+            nxt_dist_v = (min_dist_v if min_v in dist else 0) + conn_w
+            if nxt_v not in dist or nxt_dist_v < dist[nxt_v]:
+                dist[nxt_v] = nxt_dist_v
+            queue.append(nxt_v)
+
+    # print(dist)
+    return dist.get(target, inf)
 
 
 class Graph:
@@ -74,6 +109,11 @@ class Graph:
     def set_bidirectionality(self, enabled: "bool"):
         """Toggle if the graph operations should be bidirectional"""
         self._bidi = enabled
+
+    @property
+    def data(self):
+        """Data getter"""
+        return self._data
 
     @property
     def is_bidirectional(self):
@@ -136,7 +176,34 @@ class Graph:
         if not target in branch_leaves:
             if source in self._data.get(target, {}) and self.is_bidirectional:
                 return self._data[target][source]
-            raise KeyError(
-                f"[{target}] target does not exist at source [{source}]: {branch_leaves}"
-            )
+            return None
+            # raise KeyError(
+            #     f"[{target}] target does not exist at source [{source}]: {branch_leaves}"
+            # )
         return self._data[source][target]
+
+
+g = Graph()
+g.insert(0, 1, 1)
+g.insert(0, 2, 1)
+g.insert(1, 3, 1)
+g.insert(1, 4, 1)
+g.insert(3, 5, 1)
+g.insert(3, 6, 1)
+# g.set_bidirectionality(False)
+print("g", g)
+print(bfs(g, 6, 0))
+print(dfs(g, 6, 0))
+# print("0", g.get_adjacent(0))
+# print("1", g.get_adjacent(1))
+# g.retarget(1, 3)
+# print("g", g)
+# print("[0:3]", g.get_value(0, 3))
+# print("[3:0]", g.get_value(3, 0))
+# g.set_bidirectionality(False)
+# g.remove(1, 3)
+# print("g", g)
+# print("*", g.get_adjacent())
+# print("[0:3]", g.get_value(0, 3))
+# print("[3:0]", g.get_value(3, 0))
+print(dijkstra(g, 6))
