@@ -4,12 +4,24 @@
 from math import inf
 
 
-def binary(graph: "Graph", target, source=None):
+def binary(graph: "Graph", target):
     """
     Binary tree search
     https://en.wikipedia.org/wiki/Binary_search_algorithm
     """
-    return target
+    bst = graph.binarytree
+    end = len(bst)
+    start = 0
+    while len(bst[start:end]) > 1:
+        current = start + (end - start) // 2
+        v = bst[current]
+        if v == target:
+            return target
+        elif v > target:
+            end = current
+        else:
+            start = current
+    return None
 
 
 def _fs(graph: "Graph", value, root=None, pos=0):
@@ -116,9 +128,21 @@ class Graph:
         return self._data
 
     @property
+    def binarytree(self):
+        """Sort the nodes in a list representing a binary tree"""
+        return self.as_binarytree()
+
+    @property
     def is_bidirectional(self):
         """Getter for graph bidirectionality"""
         return self._bidi
+
+    def as_binarytree(self, key=None):
+        """
+        Get the nodes as an ordered list
+        Tree lookup mapping formula => i =
+        """
+        return sorted(((s, t, v[t]) for s, v in self.data.items() for t in v), key=key)
 
     def insert(self, source, target, value, reverse=None):
         """Insert source vertex and directed edge to target with weight value"""
@@ -183,27 +207,49 @@ class Graph:
         return self._data[source][target]
 
 
-g = Graph()
-g.insert(0, 1, 1)
-g.insert(0, 2, 1)
-g.insert(1, 3, 1)
-g.insert(1, 4, 1)
-g.insert(3, 5, 1)
-g.insert(3, 6, 1)
-# g.set_bidirectionality(False)
-print("g", g)
-print(bfs(g, 6, 0))
-print(dfs(g, 6, 0))
-# print("0", g.get_adjacent(0))
-# print("1", g.get_adjacent(1))
-# g.retarget(1, 3)
-# print("g", g)
-# print("[0:3]", g.get_value(0, 3))
-# print("[3:0]", g.get_value(3, 0))
-# g.set_bidirectionality(False)
-# g.remove(1, 3)
-# print("g", g)
-# print("*", g.get_adjacent())
-# print("[0:3]", g.get_value(0, 3))
-# print("[3:0]", g.get_value(3, 0))
-print(dijkstra(g, 6))
+def test_graph():
+    g = Graph()
+    g.insert(0, 1, 1)
+    g.insert(0, 2, 1)
+    g.insert(1, 3, 1)
+    g.insert(1, 4, 1)
+    g.insert(3, 5, 1)
+    g.insert(3, 6, 1)
+    # g.set_bidirectionality(False)
+    # print("g", g)
+    # print(bfs(g, 6, 0))
+    # print(dfs(g, 6, 0))
+    # print("0", g.get_adjacent(0))
+    # print("1", g.get_adjacent(1))
+    # g.retarget(1, 3)
+    # print("g", g)
+    # print("[0:3]", g.get_value(0, 3))
+    # print("[3:0]", g.get_value(3, 0))
+    # g.set_bidirectionality(False)
+    # g.remove(1, 3)
+    # print("g", g)
+    # print("*", g.get_adjacent())
+    # print("[0:3]", g.get_value(0, 3))
+    # print("[3:0]", g.get_value(3, 0))
+    return g
+
+
+def test_graph_methods():
+    """test graph creation and modification"""
+    print(test_graph())
+    print(test_graph().as_binarytree())
+
+
+def test_dijkstra_pathing():
+    """test path finding in a graph using dijkstra"""
+    print(dijkstra(test_graph(), 6))
+
+
+def test_binary_search_tree():
+    """test binary search tree"""
+    print(binary(test_graph(), (3, 6, 1)))
+
+
+test_graph_methods()
+test_dijkstra_pathing()
+test_binary_search_tree()
