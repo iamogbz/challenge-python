@@ -1,6 +1,7 @@
 """https://en.wikipedia.org/wiki/Sorting_algorithm"""
 import random
 from typing import Sequence
+from _algos import Graph
 
 
 def quick_sort(s: "Sequence"):
@@ -112,6 +113,31 @@ def merge_sort(s: "Sequence"):
 
     # print(q_a, q_b, r)
     return r
+
+
+def swap_sort(q, key=lambda n: n - 1):
+    """
+    Swap sort
+
+    :param q: the list to sort
+    :param key: convert the items to sorted index positions
+    :return: sorted list
+    """
+    g = Graph()
+    sorted_q = q[:]
+    for i, n in enumerate(q):
+        # assuming
+        g.insert(key(n), i, 0)
+
+    # print(g, g.binarytree)
+
+    for u, v, _ in g.binarytree:
+        tmp = sorted_q[v]
+        sorted_q[v] = sorted_q[u]
+        sorted_q[u] = tmp
+
+    # print(q, sorted_q)
+    return sorted_q
 
 
 def heap_sort(q):
@@ -238,6 +264,12 @@ def test_merge_sort():
         assert ec == merge_sort(tc)
 
 
+def test_swap_sort():
+    """Validate swap sort"""
+    for ec, tc in SORTING_TESTCASES:
+        assert ec == swap_sort(tc)
+
+
 # run tests
 test_quick_sort()
 test_bubble_sort()
@@ -245,3 +277,4 @@ test_comb_sort()
 test_insertion_sort()
 test_selection_sort()
 test_merge_sort()
+test_swap_sort()
