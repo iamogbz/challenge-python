@@ -101,7 +101,7 @@ def dijkstra(graph: "Graph", target, source=None):
             if nxt_v in visited_nodes:
                 continue
             conn_w = graph.get_value(min_v, nxt_v)
-            nxt_dist_v = (min_dist_v if min_v in dist else 0) + conn_w
+            nxt_dist_v = (min_dist_v if min_v in dist else 0) + (conn_w or 0)
             if nxt_v not in dist or nxt_dist_v < dist[nxt_v]:
                 dist[nxt_v] = nxt_dist_v
             queue.append(nxt_v)

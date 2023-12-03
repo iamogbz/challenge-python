@@ -1,5 +1,5 @@
 class Graph:
-    """Graph tree data structure"""
+    """Graph tree data structure, bidirectional by default"""
 
     _bidi = True  # defaults to true for undirected graphs
     _data = {}
@@ -29,7 +29,7 @@ class Graph:
     def as_binarytree(self, key=None):
         """
         Get the nodes as an ordered list
-        Tree lookup mapping formula => i =
+        :param key: tree lookup mapping formula
         """
         return sorted(((s, t, v[t]) for s, v in self.data.items() for t in v), key=key)
 
