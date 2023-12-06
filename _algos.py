@@ -31,66 +31,57 @@ class Graph:
         Get the nodes as an ordered list
         :param key: tree lookup mapping formula
         """
-        return sorted(((s, t, v[t]) for s, v in self.data.items() for t in v), key=key)
+        return sorted(
+            ((s, t, self._data.get((s, t))) for (s, t) in self._data), key=key
+        )
 
     def insert(self, source, target, value, reverse=None):
         """Insert source vertex and directed edge to target with weight value"""
-        if not self._data.get(source, None):
-            self._data[source] = {}
-        self._data[source][target] = value
-
-        if reverse is not None:  # or self.is_bidirectional:
-            if not self._data.get(target, None):
-                self._data[target] = {}
-            self._data[target][source] = value if reverse is None else reverse
+        key = (source, target)
+        if self.is_bidirectional:
+            key = tuple(sorted(key))
+        self._data[key] = value
+        if reverse is not None and not self.is_bidirectional:
+            self._data[(target, source)] = reverse
 
     def remove(self, source, target):
         """Remove vertex edge from map including the reverse direction if bidirectional"""
 
-        def _remove(s, t):
-            if s not in self._data or t not in self._data[s]:
-                return
-            del self._data[s][t]
-            if not self._data[s]:
-                del self._data[s]
+        def _remove(k):
+            if k in self._data:
+                del self._data[k]
 
-        _remove(source, target)
+        _remove((source, target))
         if self.is_bidirectional:
-            _remove(target, source)
+            _remove((target, source))
 
     def retarget(self, old_target, new_target):
-        """Replace all edges to previous source with new target"""
-        for src, src_targets in self._data.items():
-            if old_target in src_targets:
-                self.insert(src, new_target, src_targets[old_target])
-                self.remove(src, old_target)
+        """Replace all edges to previous target with new one"""
+        for left, right in set(self._data.keys()):
+            if right == old_target:
+                self._data[(left, new_target)] = self._data[(left, right)]
+                del self._data[(left, right)]
+                right = new_target  # ensure next step keeps track of new keys
 
-        if self._data.get(old_target, None):
-            self._data[new_target] = self._data[old_target]
-            del self._data[old_target]
+            if left == old_target:
+                self._data[(new_target, right)] = self._data[(old_target, right)]
+                del self._data[(old_target, right)]
 
     def get_adjacent(self, node=None):
         """Get all nodes/vertexes directly connected to this one or all when node is None"""
-        forward_conns = self._data.get(node, self._data if node is None else {}).keys()
+        conns = set()
+        for s, t in self._data.keys():
+            if node is None or s == node:
+                conns.add(t)
+            if node is None or (t == node and self.is_bidirectional):
+                conns.add(s)
 
-        reverse_conns = set()
-        if self.is_bidirectional or node is None:
-            for src, src_targets in self._data.items():
-                if node in src_targets:  # always false when None
-                    reverse_conns.add(src)
-                elif node is None:
-                    reverse_conns.update(src_targets.keys())
-
-        return [*reverse_conns.union(forward_conns)]
+        return [*conns]
 
     def get_value(self, source, target):
         """Get weight value for source target edge connection"""
-        branch_leaves = set(self._data.get(source, {}).keys())
-        if not target in branch_leaves:
-            if source in self._data.get(target, {}) and self.is_bidirectional:
-                return self._data[target][source]
-            return None
-            # raise KeyError(
-            #     f"[{target}] target does not exist at source [{source}]: {branch_leaves}"
-            # )
-        return self._data[source][target]
+        k = (source, target)
+        _k = tuple(reversed(k))
+        if self.is_bidirectional and _k in self._data:
+            return self._data.get(_k)
+        return self._data.get(k, None)
