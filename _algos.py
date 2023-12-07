@@ -85,3 +85,29 @@ class Graph:
         if self.is_bidirectional and _k in self._data:
             return self._data.get(_k)
         return self._data.get(k, None)
+
+    def get_components(self):
+        """Get the connected components in the graph"""
+        unvisited_nodes = set(self.get_adjacent())
+        next_nodes = []
+        component_groups = []
+
+        while unvisited_nodes:
+            # reset the current group
+            current_group = set()
+            # initiate the next group node
+            next_nodes = [unvisited_nodes.pop()]
+            while next_nodes:
+                current_node = next_nodes.pop()
+                if current_node in unvisited_nodes:
+                    unvisited_nodes.remove(current_node)
+
+                current_group.add(current_node)
+                next_nodes.extend(
+                    n for n in self.get_adjacent(current_node) if n not in current_group
+                )
+            # no more connected nodes so add component group
+            component_groups.append(current_group)
+
+        # print(component_groups)
+        return component_groups
